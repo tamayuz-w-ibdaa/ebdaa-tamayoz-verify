@@ -3,127 +3,221 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>التحقق من أصالة المنتج | إبداع وتميز</title>
 
 <style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
 body{
 font-family:Tahoma,sans-serif;
-background:#f5f7fa;
-padding:20px;
-text-align:center;
+background:#f4f6f9;
+padding:15px;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
 }
 
 .card{
-max-width:500px;
-margin:auto;
+width:100%;
+max-width:450px;
 background:#fff;
-padding:25px;
 border-radius:20px;
-box-shadow:0 0 15px rgba(0,0,0,.1);
+padding:25px;
+box-shadow:0 10px 25px rgba(0,0,0,.08);
+text-align:center;
 }
 
 .logo{
-width:120px;
+width:130px;
 margin-bottom:15px;
 }
 
-.product{
+.product-image{
 width:220px;
+max-width:100%;
 border-radius:15px;
 margin:15px auto;
 display:none;
 }
 
 .success{
-color:green;
-font-size:24px;
+color:#0a8f3c;
+font-size:26px;
 font-weight:bold;
+margin-bottom:15px;
 }
 
 .error{
-color:red;
+color:#d62828;
 font-size:24px;
 font-weight:bold;
+margin-bottom:15px;
 }
 
 .info{
+background:#f8f9fb;
+border-radius:12px;
+padding:12px;
 margin:8px 0;
+font-size:16px;
+}
+
+.warning{
+background:#fff3cd;
+color:#856404;
+padding:12px;
+border-radius:12px;
+margin-top:12px;
+}
+
+.lang-switch{
+margin-bottom:15px;
+}
+
+.lang-switch button{
+border:none;
+cursor:pointer;
+padding:8px 14px;
+border-radius:8px;
+margin:0 4px;
+background:#eceff3;
+}
+
+.loading{
 font-size:18px;
+color:#666;
 }
 </style>
 </head>
+
 <body>
 
 <div class="card">
 
-<img src="logo.png" class="logo">
+<div class="lang-switch">
+<button onclick="changeLang('ar')">العربية</button>
+<button onclick="changeLang('en')">English</button>
+</div>
 
-<div id="result">
+<img src="logo.png" class="logo" alt="Logo">
+
+<div id="result" class="loading">
 جاري التحقق من المنتج...
 </div>
 
-<img id="productImage"
+<img
+id="productImage"
+class="product-image"
 src="ebdaa-tamayoz-product.png"
-class="product">
+alt="Product">
 
 </div>
 
 <script>
 
+const API_URL =
+"https://script.google.com/macros/s/AKfycbylyYr1uL3_CklVBe-MyRDs7n4mOohqM9-FZMWAU_qNGaxiTgimuyDgv-h8Aw84J6Q1RQ/exec";
+
+const lang = localStorage.getItem("lang") || "ar";
+
+function changeLang(l){
+localStorage.setItem("lang",l);
+location.reload();
+}
+
+const txt = {
+
+ar:{
+loading:"جاري التحقق من المنتج...",
+auth:"✅ منتج أصلي ومعتمد",
+product:"المنتج",
+batch:"رقم الدفعة",
+count:"عدد مرات التحقق",
+warning:"⚠️ تم التحقق من هذا المنتج مرات عديدة، يرجى التأكد من مصدر الشراء.",
+notfound:"❌ المنتج غير موجود",
+error:"تعذر الاتصال بالخادم"
+},
+
+en:{
+loading:"Verifying Product...",
+auth:"✅ Authentic Product",
+product:"Product",
+batch:"Batch",
+count:"Verification Count",
+warning:"⚠️ This product has been verified many times. Please verify the source of purchase.",
+notfound:"❌ Product Not Found",
+error:"Unable to connect to server"
+}
+
+};
+
 const code =
 new URLSearchParams(window.location.search).get("code");
 
-fetch(
-"https://script.google.com/macros/s/AKfycbylyYr1uL3_CklVBe-MyRDs7n4mOohqM9-FZMWAU_qNGaxiTgimuyDgv-h8Aw84J6Q1RQ/exec?code="
-+ encodeURIComponent(code)
-)
+if(code){
+
+fetch(API_URL + "?code=" + encodeURIComponent(code))
 .then(r=>r.json())
 .then(data=>{
+
+window.history.replaceState({},'', '/');
 
 if(data.success){
 
 document.getElementById("productImage").style.display="block";
 
-document.getElementById("result").innerHTML=`
-<div class="success">✅ منتج أصلي</div>
+let html = `
+<div class="success">${txt[lang].auth}</div>
 
 <div class="info">
-الكود: ${data.code}
+${txt[lang].product}: ${data.product}
 </div>
 
 <div class="info">
-المنتج: ${data.product}
+${txt[lang].batch}: ${data.batch}
 </div>
 
 <div class="info">
-الدفعة: ${data.batch}
-</div>
-
-<div class="info">
-عدد مرات التحقق: ${data.scanCount}
+${txt[lang].count}: ${data.scanCount}
 </div>
 `;
+
+if(Number(data.scanCount) >= 20){
+html += `
+<div class="warning">
+${txt[lang].warning}
+</div>`;
+}
+
+document.getElementById("result").innerHTML = html;
 
 }else{
 
-document.getElementById("result").innerHTML=`
-<div class="error">
-❌ المنتج غير موجود
-</div>
-`;
+document.getElementById("result").innerHTML =
+`<div class="error">${txt[lang].notfound}</div>`;
 
 }
 
 })
 .catch(()=>{
 
-document.getElementById("result").innerHTML=`
-<div class="error">
-تعذر الاتصال بالخادم
-</div>
-`;
+document.getElementById("result").innerHTML =
+`<div class="error">${txt[lang].error}</div>`;
 
 });
+
+}else{
+
+document.getElementById("result").innerHTML =
+`<div class="error">${txt[lang].notfound}</div>`;
+
+}
 
 </script>
 
