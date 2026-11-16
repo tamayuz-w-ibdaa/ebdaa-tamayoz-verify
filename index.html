@@ -141,10 +141,24 @@ alt="Product">
 
 const API_URL = "https://script.google.com/macros/s/AKfycbylyYr1uL3_CklVBe-MyRDs7n4mOohqM9-FZMWAU_qNGaxiTgimuyDgv-h8Aw84J6Q1RQ/exec";
 
-const code =
-new URLSearchParams(window.location.search).get("code");
+const code = (
+new URLSearchParams(window.location.search).get("code") || ""
+)
+.trim()
+.toUpperCase();
 
-if(code){
+/* حماية المدخلات */
+if (!/^[A-Z0-9]{5}$/.test(code)) {
+
+document.getElementById("result").innerHTML = `
+<div class="error">
+❌ Invalid Product Code | رمز المنتج غير صالح
+</div>
+`;
+
+throw new Error("Invalid Product Code");
+
+}
 
 fetch(API_URL + "?code=" + encodeURIComponent(code))
 .then(response => response.json())
@@ -165,25 +179,25 @@ let html = `
 <div class="label">
 Product Name | اسم المنتج
 </div>
-${data.product}
+${String(data.product || "")}
 </div>
 
 <div class="info">
 <div class="label">
 Batch Number | رقم الدفعة
 </div>
-${data.batch}
+${String(data.batch || "")}
 </div>
 
 <div class="info">
 <div class="label">
 Verification Count | عدد مرات التحقق
 </div>
-${data.scanCount}
+${Number(data.scanCount || 0)}
 </div>
 `;
 
-if(Number(data.scanCount) >= 20){
+if(Number(data.scanCount || 0) >= 20){
 
 html += `
 <div class="warning">
@@ -214,16 +228,6 @@ document.getElementById("result").innerHTML = `
 `;
 
 });
-
-}else{
-
-document.getElementById("result").innerHTML = `
-<div class="error">
-❌ Product Code Missing | رمز المنتج غير موجود
-</div>
-`;
-
-}
 
 </script>
 
