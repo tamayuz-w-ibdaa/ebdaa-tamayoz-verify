@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>التحقق من أصالة المنتج | إبداع وتميز</title>
+<title>التحقق من أصالة المنتج | Product Authenticity Verification</title>
 
 <style>
 *{
@@ -14,13 +14,13 @@ box-sizing:border-box;
 }
 
 body{
-font-family:Tahoma,Arial,sans-serif;
+font-family:Tahoma, Arial, sans-serif;
 background:#f4f6f9;
 padding:20px;
+min-height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-min-height:100vh;
 }
 
 .card{
@@ -30,18 +30,19 @@ background:#fff;
 border-radius:20px;
 padding:25px;
 text-align:center;
-box-shadow:0 8px 25px rgba(0,0,0,.08);
+box-shadow:0 10px 30px rgba(0,0,0,.08);
 }
 
 .logo{
-width:130px;
+width:140px;
 margin-bottom:15px;
 }
 
 .title{
-font-size:20px;
+font-size:22px;
 font-weight:bold;
-margin-bottom:5px;
+color:#222;
+margin-bottom:8px;
 }
 
 .subtitle{
@@ -54,32 +55,34 @@ margin-bottom:20px;
 width:220px;
 max-width:100%;
 border-radius:15px;
-display:none;
 margin:15px auto;
+display:none;
 }
 
 .success{
-background:#e8f8ee;
+background:#e9f8ef;
 color:#198754;
 padding:15px;
 border-radius:12px;
+font-size:18px;
 font-weight:bold;
 line-height:1.8;
 margin-bottom:15px;
 }
 
 .error{
-background:#fdeaea;
+background:#fdecec;
 color:#dc3545;
 padding:15px;
 border-radius:12px;
+font-size:18px;
 font-weight:bold;
 line-height:1.8;
 }
 
 .info{
 background:#f8f9fb;
-padding:12px;
+padding:14px;
 border-radius:12px;
 margin:10px 0;
 line-height:1.8;
@@ -87,7 +90,8 @@ line-height:1.8;
 
 .label{
 font-weight:bold;
-color:#333;
+color:#222;
+margin-bottom:5px;
 }
 
 .warning{
@@ -95,12 +99,12 @@ background:#fff3cd;
 color:#856404;
 padding:12px;
 border-radius:12px;
+margin-top:12px;
 line-height:1.8;
-margin-top:10px;
 }
 
 .loading{
-font-size:17px;
+font-size:18px;
 color:#666;
 line-height:1.8;
 }
@@ -122,8 +126,7 @@ Product Authenticity Verification
 </div>
 
 <div id="result" class="loading">
-جاري التحقق من المنتج...<br>
-Verifying Product...
+جاري التحقق من المنتج... | Verifying Product...
 </div>
 
 <img
@@ -136,8 +139,7 @@ alt="Product">
 
 <script>
 
-const API_URL =
-"https://script.google.com/macros/s/AKfycbylyYr1uL3_CklVBe-MyRDs7n4mOohqM9-FZMWAU_qNGaxiTgimuyDgv-h8Aw84J6Q1RQ/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbylyYr1uL3_CklVBe-MyRDs7n4mOohqM9-FZMWAU_qNGaxiTgimuyDgv-h8Aw84J6Q1RQ/exec";
 
 const code =
 new URLSearchParams(window.location.search).get("code");
@@ -156,22 +158,27 @@ document.getElementById("productImage").style.display = "block";
 
 let html = `
 <div class="success">
-✅ منتج أصلي ومعتمد<br>
-✅ Authentic & Verified Product
+✅ Authentic & Verified Product | منتج أصلي ومعتمد
 </div>
 
 <div class="info">
-<div class="label">المنتج<br>Product</div>
+<div class="label">
+Product Name | اسم المنتج
+</div>
 ${data.product}
 </div>
 
 <div class="info">
-<div class="label">رقم الدفعة<br>Batch Number</div>
+<div class="label">
+Batch Number | رقم الدفعة
+</div>
 ${data.batch}
 </div>
 
 <div class="info">
-<div class="label">عدد مرات التحقق<br>Verification Count</div>
+<div class="label">
+Verification Count | عدد مرات التحقق
+</div>
 ${data.scanCount}
 </div>
 `;
@@ -180,8 +187,7 @@ if(Number(data.scanCount) >= 20){
 
 html += `
 <div class="warning">
-⚠️ تم التحقق من هذا المنتج مرات عديدة.<br>
-⚠️ This product has been verified many times.
+⚠️ This product has been verified many times | تم التحقق من هذا المنتج مرات عديدة
 </div>
 `;
 }
@@ -192,8 +198,7 @@ document.getElementById("result").innerHTML = html;
 
 document.getElementById("result").innerHTML = `
 <div class="error">
-❌ المنتج غير موجود<br>
-❌ Product Not Found
+❌ Product Not Found | المنتج غير موجود
 </div>
 `;
 
@@ -204,8 +209,7 @@ document.getElementById("result").innerHTML = `
 
 document.getElementById("result").innerHTML = `
 <div class="error">
-❌ تعذر الاتصال بالخادم<br>
-❌ Unable to connect to server
+❌ Unable to connect to the server | تعذر الاتصال بالخادم
 </div>
 `;
 
@@ -215,8 +219,7 @@ document.getElementById("result").innerHTML = `
 
 document.getElementById("result").innerHTML = `
 <div class="error">
-❌ رمز المنتج غير موجود<br>
-❌ Product Code Missing
+❌ Product Code Missing | رمز المنتج غير موجود
 </div>
 `;
 
