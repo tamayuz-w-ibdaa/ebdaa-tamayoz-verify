@@ -14,9 +14,9 @@ box-sizing:border-box;
 }
 
 body{
-font-family:Tahoma,sans-serif;
+font-family:Tahoma,Arial,sans-serif;
 background:#f4f6f9;
-padding:15px;
+padding:20px;
 display:flex;
 justify-content:center;
 align-items:center;
@@ -25,12 +25,12 @@ min-height:100vh;
 
 .card{
 width:100%;
-max-width:450px;
+max-width:500px;
 background:#fff;
 border-radius:20px;
 padding:25px;
-box-shadow:0 10px 25px rgba(0,0,0,.08);
 text-align:center;
+box-shadow:0 8px 25px rgba(0,0,0,.08);
 }
 
 .logo{
@@ -38,34 +38,56 @@ width:130px;
 margin-bottom:15px;
 }
 
+.title{
+font-size:20px;
+font-weight:bold;
+margin-bottom:5px;
+}
+
+.subtitle{
+font-size:14px;
+color:#666;
+margin-bottom:20px;
+}
+
 .product-image{
 width:220px;
 max-width:100%;
 border-radius:15px;
-margin:15px auto;
 display:none;
+margin:15px auto;
 }
 
 .success{
-color:#0a8f3c;
-font-size:26px;
+background:#e8f8ee;
+color:#198754;
+padding:15px;
+border-radius:12px;
 font-weight:bold;
+line-height:1.8;
 margin-bottom:15px;
 }
 
 .error{
-color:#d62828;
-font-size:24px;
+background:#fdeaea;
+color:#dc3545;
+padding:15px;
+border-radius:12px;
 font-weight:bold;
-margin-bottom:15px;
+line-height:1.8;
 }
 
 .info{
 background:#f8f9fb;
-border-radius:12px;
 padding:12px;
-margin:8px 0;
-font-size:16px;
+border-radius:12px;
+margin:10px 0;
+line-height:1.8;
+}
+
+.label{
+font-weight:bold;
+color:#333;
 }
 
 .warning{
@@ -73,25 +95,14 @@ background:#fff3cd;
 color:#856404;
 padding:12px;
 border-radius:12px;
-margin-top:12px;
-}
-
-.lang-switch{
-margin-bottom:15px;
-}
-
-.lang-switch button{
-border:none;
-cursor:pointer;
-padding:8px 14px;
-border-radius:8px;
-margin:0 4px;
-background:#eceff3;
+line-height:1.8;
+margin-top:10px;
 }
 
 .loading{
-font-size:18px;
+font-size:17px;
 color:#666;
+line-height:1.8;
 }
 </style>
 </head>
@@ -100,15 +111,19 @@ color:#666;
 
 <div class="card">
 
-<div class="lang-switch">
-<button onclick="changeLang('ar')">العربية</button>
-<button onclick="changeLang('en')">English</button>
-</div>
-
 <img src="logo.png" class="logo" alt="Logo">
 
+<div class="title">
+التحقق من أصالة المنتج
+</div>
+
+<div class="subtitle">
+Product Authenticity Verification
+</div>
+
 <div id="result" class="loading">
-جاري التحقق من المنتج...
+جاري التحقق من المنتج...<br>
+Verifying Product...
 </div>
 
 <img
@@ -124,98 +139,86 @@ alt="Product">
 const API_URL =
 "https://script.google.com/macros/s/AKfycbylyYr1uL3_CklVBe-MyRDs7n4mOohqM9-FZMWAU_qNGaxiTgimuyDgv-h8Aw84J6Q1RQ/exec";
 
-const lang = localStorage.getItem("lang") || "ar";
-
-function changeLang(l){
-localStorage.setItem("lang",l);
-location.reload();
-}
-
-const txt = {
-
-ar:{
-loading:"جاري التحقق من المنتج...",
-auth:"✅ منتج أصلي ومعتمد",
-product:"المنتج",
-batch:"رقم الدفعة",
-count:"عدد مرات التحقق",
-warning:"⚠️ تم التحقق من هذا المنتج مرات عديدة، يرجى التأكد من مصدر الشراء.",
-notfound:"❌ المنتج غير موجود",
-error:"تعذر الاتصال بالخادم"
-},
-
-en:{
-loading:"Verifying Product...",
-auth:"✅ Authentic Product",
-product:"Product",
-batch:"Batch",
-count:"Verification Count",
-warning:"⚠️ This product has been verified many times. Please verify the source of purchase.",
-notfound:"❌ Product Not Found",
-error:"Unable to connect to server"
-}
-
-};
-
 const code =
 new URLSearchParams(window.location.search).get("code");
 
 if(code){
 
 fetch(API_URL + "?code=" + encodeURIComponent(code))
-.then(r=>r.json())
-.then(data=>{
+.then(response => response.json())
+.then(data => {
 
-window.history.replaceState({},'', '/');
+window.history.replaceState({}, '', '/');
 
 if(data.success){
 
-document.getElementById("productImage").style.display="block";
+document.getElementById("productImage").style.display = "block";
 
 let html = `
-<div class="success">${txt[lang].auth}</div>
-
-<div class="info">
-${txt[lang].product}: ${data.product}
+<div class="success">
+✅ منتج أصلي ومعتمد<br>
+✅ Authentic & Verified Product
 </div>
 
 <div class="info">
-${txt[lang].batch}: ${data.batch}
+<div class="label">المنتج<br>Product</div>
+${data.product}
 </div>
 
 <div class="info">
-${txt[lang].count}: ${data.scanCount}
+<div class="label">رقم الدفعة<br>Batch Number</div>
+${data.batch}
+</div>
+
+<div class="info">
+<div class="label">عدد مرات التحقق<br>Verification Count</div>
+${data.scanCount}
 </div>
 `;
 
 if(Number(data.scanCount) >= 20){
+
 html += `
 <div class="warning">
-${txt[lang].warning}
-</div>`;
+⚠️ تم التحقق من هذا المنتج مرات عديدة.<br>
+⚠️ This product has been verified many times.
+</div>
+`;
 }
 
 document.getElementById("result").innerHTML = html;
 
 }else{
 
-document.getElementById("result").innerHTML =
-`<div class="error">${txt[lang].notfound}</div>`;
+document.getElementById("result").innerHTML = `
+<div class="error">
+❌ المنتج غير موجود<br>
+❌ Product Not Found
+</div>
+`;
 
 }
 
 })
-.catch(()=>{
+.catch(() => {
 
-document.getElementById("result").innerHTML =
-`<div class="error">${txt[lang].error}</div>`;
+document.getElementById("result").innerHTML = `
+<div class="error">
+❌ تعذر الاتصال بالخادم<br>
+❌ Unable to connect to server
+</div>
+`;
 
 });
 
 }else{
 
-document.getElementById("result").innerHTML =
-`<div class="error">${txt[lang].notfound}</div>`;
+document.getElementById("result").innerHTML = `
+<div class="error">
+❌ رمز المنتج غير موجود<br>
+❌ Product Code Missing
+</div>
+`;
 
 }
 
